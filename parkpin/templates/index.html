@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ParkPin</title>
+  <title>ParkTrace</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -12,19 +12,20 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
+      padding: 2rem 1rem;
       min-height: 100vh;
-      padding: 1rem;
     }
     h1 { font-size: 24px; margin-bottom: 0.25rem; }
     p.sub { color: #666; font-size: 14px; margin-bottom: 2rem; }
+
     .card {
       background: white;
       border-radius: 12px;
       padding: 2rem;
       width: 100%;
-      max-width: 400px;
+      max-width: 480px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      margin-bottom: 1.5rem;
     }
     input {
       width: 100%;
@@ -61,17 +62,132 @@
       text-align: center;
       margin: 0.5rem 0;
     }
+
+    /* MAP STYLES */
+    .map-card {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+      display: none;
+    }
+    .map-card h2 {
+      font-size: 15px;
+      color: #444;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .zone-box {
+      fill: #e0e0e0;
+      stroke: #bbb;
+      stroke-width: 1.5;
+      rx: 6;
+      cursor: default;
+      transition: fill 0.3s;
+    }
+    .zone-box.highlight {
+      fill: #ef5350;
+      stroke: #c62828;
+    }
+    .zone-label {
+      font-size: 13px;
+      font-family: sans-serif;
+      fill: #444;
+      text-anchor: middle;
+      dominant-baseline: central;
+      pointer-events: none;
+    }
+    .zone-label.highlight {
+      fill: white;
+      font-weight: bold;
+    }
+    .map-legend {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 1rem;
+      font-size: 12px;
+      color: #666;
+    }
+    .legend-dot {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
   </style>
 </head>
 <body>
 
-  <h1>🅿️ ParkPingot</h1>
+  <h1>🅿️ ParkTrace</h1>
   <p class="sub">Find your vehicle instantly</p>
 
+  <!-- SEARCH CARD -->
   <div class="card">
     <input type="text" id="plateInput" placeholder="Enter vehicle number (e.g. TN09AB1234)" />
     <button onclick="findVehicle()">Find My Vehicle</button>
     <div id="result"></div>
+  </div>
+
+  <!-- MAP CARD -->
+  <div class="map-card" id="mapCard">
+    <h2>📍 Your vehicle is highlighted on the map</h2>
+
+    <svg width="100%" viewBox="0 0 420 320" xmlns="http://www.w3.org/2000/svg">
+
+      <!-- ENTRANCE LABEL -->
+      <rect x="160" y="285" width="100" height="28" rx="6" fill="#1a1a1a"/>
+      <text x="210" y="299" font-size="12" fill="white" text-anchor="middle" dominant-baseline="central" font-family="sans-serif">⬆ ENTRANCE</text>
+
+      <!-- ROW A -->
+      <rect id="zone-A1" class="zone-box" x="20"  y="20" width="80" height="60" rx="6"/>
+      <text id="label-A1" class="zone-label" x="60"  y="50">A1</text>
+
+      <rect id="zone-A2" class="zone-box" x="120" y="20" width="80" height="60" rx="6"/>
+      <text id="label-A2" class="zone-label" x="160" y="50">A2</text>
+
+      <rect id="zone-A3" class="zone-box" x="220" y="20" width="80" height="60" rx="6"/>
+      <text id="label-A3" class="zone-label" x="260" y="50">A3</text>
+
+      <rect id="zone-A4" class="zone-box" x="320" y="20" width="80" height="60" rx="6"/>
+      <text id="label-A4" class="zone-label" x="360" y="50">A4</text>
+
+      <!-- ROW B -->
+      <rect id="zone-B1" class="zone-box" x="20"  y="110" width="80" height="60" rx="6"/>
+      <text id="label-B1" class="zone-label" x="60"  y="140">B1</text>
+
+      <rect id="zone-B2" class="zone-box" x="120" y="110" width="80" height="60" rx="6"/>
+      <text id="label-B2" class="zone-label" x="160" y="140">B2</text>
+
+      <rect id="zone-B3" class="zone-box" x="220" y="110" width="80" height="60" rx="6"/>
+      <text id="label-B3" class="zone-label" x="260" y="140">B3</text>
+
+      <rect id="zone-B4" class="zone-box" x="320" y="110" width="80" height="60" rx="6"/>
+      <text id="label-B4" class="zone-label" x="360" y="140">B4</text>
+
+      <!-- ROW C -->
+      <rect id="zone-C1" class="zone-box" x="20"  y="200" width="80" height="60" rx="6"/>
+      <text id="label-C1" class="zone-label" x="60"  y="230">C1</text>
+
+      <rect id="zone-C2" class="zone-box" x="120" y="200" width="80" height="60" rx="6"/>
+      <text id="label-C2" class="zone-label" x="160" y="230">C2</text>
+
+      <rect id="zone-C3" class="zone-box" x="220" y="200" width="80" height="60" rx="6"/>
+      <text id="label-C3" class="zone-label" x="260" y="230">C3</text>
+
+      <rect id="zone-C4" class="zone-box" x="320" y="200" width="80" height="60" rx="6"/>
+      <text id="label-C4" class="zone-label" x="360" y="230">C4</text>
+
+    </svg>
+
+    <div class="map-legend">
+      <span><span class="legend-dot" style="background:#e0e0e0;border:1px solid #bbb"></span>Available zone</span>
+      <span><span class="legend-dot" style="background:#ef5350"></span>Your vehicle</span>
+    </div>
   </div>
 
   <script>
@@ -87,7 +203,12 @@
 
       const data = await response.json();
       const resultDiv = document.getElementById("result");
+      const mapCard = document.getElementById("mapCard");
+
       resultDiv.style.display = "block";
+
+      // Clear all previous highlights
+      clearHighlights();
 
       if (data.found) {
         resultDiv.className = "found";
@@ -96,17 +217,34 @@
           <div class="zone-big">${data.zone}</div>
           <p style="text-align:center; color:#555; font-size:13px">Walk to zone ${data.zone} to find your vehicle</p>
         `;
+
+        // Show map and highlight the zone
+        mapCard.style.display = "block";
+        highlightZone(data.zone);
+
       } else {
         resultDiv.className = "not-found";
         resultDiv.innerHTML = `<p>❌ Vehicle <strong>${data.plate}</strong> not found. Did you park with us?</p>`;
+        mapCard.style.display = "none";
       }
     }
 
-    // Allow pressing Enter key too
+    function highlightZone(zone) {
+      const box = document.getElementById("zone-" + zone);
+      const label = document.getElementById("label-" + zone);
+      if (box) box.classList.add("highlight");
+      if (label) label.classList.add("highlight");
+    }
+
+    function clearHighlights() {
+      document.querySelectorAll(".zone-box").forEach(el => el.classList.remove("highlight"));
+      document.querySelectorAll(".zone-label").forEach(el => el.classList.remove("highlight"));
+    }
+
     document.getElementById("plateInput").addEventListener("keypress", function(e) {
       if (e.key === "Enter") findVehicle();
     });
   </script>
 
 </body>
-</html>=
+</html>
