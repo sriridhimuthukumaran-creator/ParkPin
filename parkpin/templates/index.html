@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ParkPin</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: sans-serif;
+      background: #f4f4f4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 1rem;
+    }
+    h1 { font-size: 24px; margin-bottom: 0.25rem; }
+    p.sub { color: #666; font-size: 14px; margin-bottom: 2rem; }
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 16px;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #1a1a1a;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover { background: #333; }
+    #result {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      border-radius: 8px;
+      font-size: 15px;
+      display: none;
+    }
+    .found { background: #e8f5e9; color: #2e7d32; }
+    .not-found { background: #ffebee; color: #c62828; }
+    .zone-big {
+      font-size: 48px;
+      font-weight: bold;
+      text-align: center;
+      margin: 0.5rem 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🅿️ ParkPingot</h1>
+  <p class="sub">Find your vehicle instantly</p>
+
+  <div class="card">
+    <input type="text" id="plateInput" placeholder="Enter vehicle number (e.g. TN09AB1234)" />
+    <button onclick="findVehicle()">Find My Vehicle</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    async function findVehicle() {
+      const plate = document.getElementById("plateInput").value.trim();
+      if (!plate) return;
+
+      const response = await fetch("/find", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plate: plate })
+      });
+
+      const data = await response.json();
+      const resultDiv = document.getElementById("result");
+      resultDiv.style.display = "block";
+
+      if (data.found) {
+        resultDiv.className = "found";
+        resultDiv.innerHTML = `
+          <p>Vehicle found! Your zone is</p>
+          <div class="zone-big">${data.zone}</div>
+          <p style="text-align:center; color:#555; font-size:13px">Walk to zone ${data.zone} to find your vehicle</p>
+        `;
+      } else {
+        resultDiv.className = "not-found";
+        resultDiv.innerHTML = `<p>❌ Vehicle <strong>${data.plate}</strong> not found. Did you park with us?</p>`;
+      }
+    }
+
+    // Allow pressing Enter key too
+    document.getElementById("plateInput").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") findVehicle();
+    });
+  </script>
+
+</body>
+</html>=
